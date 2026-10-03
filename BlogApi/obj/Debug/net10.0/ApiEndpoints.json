@@ -1,0 +1,12 @@
+[
+  {
+    "ContainingType": "BlogApi.Controllers.BloggerController",
+    "Method": "GetAllBlogger",
+    "RelativePath": "blogger/bloggers",
+    "HttpMethod": "GET",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [],
+    "ReturnTypes": []
+  }
+]
