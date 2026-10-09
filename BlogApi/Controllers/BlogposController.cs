@@ -155,5 +155,35 @@ namespace BlogApi.Controllers
             return new { message = "sikeres hozzáadás", result = NewBloggpostDTO };
         }
 
+        [HttpPut("update/post/{id}")]
+        public object UpdateBloggpost([FromRoute] int id, [FromBody] updateBloggpostDTO updateBloggpostDTO)
+        {
+            var connector = new MySqlConnection(ConnectionString);
+
+            connector.Open();
+
+            string sql = @"UPDATE `blogpost` SET `title`=@title,`content`=@content WHERE `id` = @id;";
+
+            var cmd = new MySqlCommand(sql, connector);
+
+            cmd.Parameters.AddWithValue("@title", updateBloggpostDTO.Title);
+            cmd.Parameters.AddWithValue("@content", updateBloggpostDTO.Content);
+            cmd.Parameters.AddWithValue("@id", id);
+
+            object result = null;
+
+            if (cmd.ExecuteNonQuery() > 0)
+            {
+                result = StatusCode(200, new { message = "Sikeres frissítés", result = updateBloggpostDTO });
+            }
+            else
+            {
+                result = NotFound(new { message = "Nincs ilyen tag", result = updateBloggpostDTO });
+            }
+
+            connector.Close();
+
+            return result;
+        }
     }
 }
