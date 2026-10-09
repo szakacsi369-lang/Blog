@@ -1,11 +1,12 @@
 ﻿using BlogApi.Models;
+using BlogApi.Models.DTOs;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using MySqlConnector;
 
 namespace BlogApi.Controllers
 {
-    [Route("api/[controller]")]
+    [Route("blogpost")]
     [ApiController]
     public class BlogposController : ControllerBase
     {
@@ -45,6 +46,92 @@ namespace BlogApi.Controllers
 
             return new { message = "Sikeres lekérdezés", result = lista };
         }
+
+        [HttpGet("byId/{id}")]
+        public object GetBloggPostsById([FromRoute] int id)
+        {
+            var connector = new MySqlConnection(ConnectionString);
+
+            connector.Open();
+
+            string sql = @"Select * FROM blogpost Where id = @id";
+
+            var cmd = new MySqlCommand(sql, connector);
+
+            cmd.Parameters.AddWithValue("@id", id);
+
+            var datareader = cmd.ExecuteReader();
+
+            object result = null;
+
+            if (datareader.Read())
+            {
+                var bloggpost = new Blogpost
+                {
+                    Id = datareader.GetInt32(0),
+                    Title = datareader.GetString(1),
+                    Content = datareader.GetString(2),
+                    postTime = datareader.GetDateTime(3),
+                    updateTime = datareader.GetDateTime(4),
+                    blogId = datareader.GetInt32(5)
+                };
+
+                result = new { message = "Sikeres lekérdezés", result = bloggpost };
+            }
+
+            else
+            {
+                result = new { message = "Sikertelen lekérdezés", result = "" };
+            }
+
+            connector.Close();
+
+            return result;
+        }
+
+        [HttpPost("Title")]
+        public object PostBloggpostTitle([FromBody] BlogpostTitleDTO BlogpostTitleDTO)
+        {
+            var connector = new MySqlConnection(ConnectionString);
+
+            connector.Open();
+
+            string sql = @"Select * FROM blogpost Where title = @title";
+
+            var cmd = new MySqlCommand(sql, connector);
+
+            cmd.Parameters.AddWithValue("@title", BlogpostTitleDTO.Title);
+
+            var datareader = cmd.ExecuteReader();
+
+            object result = null;
+
+            if (datareader.Read())
+            {
+                var bloggpost = new Blogpost
+                {
+                    Id = datareader.GetInt32(0),
+                    Title = datareader.GetString(1),
+                    Content = datareader.GetString(2),
+                    postTime = datareader.GetDateTime(3),
+                    updateTime = datareader.GetDateTime(4),
+                    blogId = datareader.GetInt32(5)
+                };
+
+                result = new { message = "Reisztrált tag", result = bloggpost };
+            }
+
+            else
+            {
+                result = new { message = "Nem regisztrált tag", result = "" };
+            }
+
+            connector.Close();
+
+            return result;
+        }
+
+
 
     }
 }
