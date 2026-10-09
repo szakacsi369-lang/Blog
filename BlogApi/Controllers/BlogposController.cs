@@ -131,7 +131,29 @@ namespace BlogApi.Controllers
             return result;
         }
 
+        [HttpPost("newbloggpost")]
+        public object AddNewBlogger([FromBody] NewBloggpostDTO NewBloggpostDTO)
+        {
+            var connector = new MySqlConnection(ConnectionString);
 
+            connector.Open();
+
+            string sql = @"INSERT INTO `blogpost`(`Title`, `Content`, `blogId`, `postTime`, `updateTime` ) VALUES (@title,@content,@blogId,@postTime,@updateTime)";
+
+            var cmd = new MySqlCommand(sql, connector);
+
+            cmd.Parameters.AddWithValue("@title", NewBloggpostDTO.Title);
+            cmd.Parameters.AddWithValue("@content", NewBloggpostDTO.Content);
+            cmd.Parameters.AddWithValue("@blogId", NewBloggpostDTO.blogId);
+            cmd.Parameters.AddWithValue("@postTime", DateTime.Now);
+            cmd.Parameters.AddWithValue("@updateTime", DateTime.Now);
+
+            cmd.ExecuteNonQuery();
+
+            connector.Close();
+
+            return new { message = "sikeres hozzáadás", result = NewBloggpostDTO };
+        }
 
     }
 }
